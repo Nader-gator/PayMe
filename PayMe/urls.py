@@ -14,6 +14,6 @@ urlpatterns = [
     path('register/', create_new_user, name='register'),
     path('profile/', edit_user, name='profile'),
     path('', include('homepage.urls')),
-    path('renter', include('renter.urls')),
+    path('renter/', include('renter.urls')),
     # path('landlord', include('landlord.urls'))
 ]

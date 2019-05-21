@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'landlord.apps.LandlordConfig',
     'renter.apps.RenterConfig',
+    'charges.apps.ChargesConfig',
 ]
 
 MIDDLEWARE = [
