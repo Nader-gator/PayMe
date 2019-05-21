@@ -17,11 +17,16 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin', 'django.contrib.auth',
-    'django.contrib.contenttypes', 'django.contrib.sessions',
-    'django.contrib.messages', 'django.contrib.staticfiles',
-    'homepage.apps.HomepageConfig', 'users.apps.UsersConfig',
-    'landlord.apps.LandlordConfig', 'renter.apps.RenterConfig'
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'homepage.apps.HomepageConfig',
+    'users.apps.UsersConfig',
+    'landlord.apps.LandlordConfig',
+    'renter.apps.RenterConfig',
 ]
 
 MIDDLEWARE = [
