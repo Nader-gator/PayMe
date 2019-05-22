@@ -1,0 +1,6 @@
+{% extends 'homepage/base.html' %} {% block content %} {% if rents %} {% else %}
+<div>
+  <h1>You have not created any rents yet</h1>
+  <a href="{% url 'new-rent' %}">Click here to create a rent</a>
+</div>
+{% endif %} {% endblock content %}

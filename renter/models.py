@@ -1,6 +1,6 @@
 from django.db import models
 from users.models import User
-from charges.models import Rent
+from landlord.models import Rent
 
 
 class Renter(models.Model):

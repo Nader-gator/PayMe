@@ -1,4 +1,4 @@
 {% extends 'homepage/base.html' %} {% block content %}
-<a href="#">Renter</a>
-<a href="#">Landlord</a>
+<a href="{% url 'renter-dashboard' %}">Renter</a>
+<a href="{% url 'landlord-dashboard' %}">Landlord</a>
 {% endblock content %}

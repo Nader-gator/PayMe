@@ -15,5 +15,5 @@ urlpatterns = [
     path('profile/', edit_user, name='profile'),
     path('', include('homepage.urls')),
     path('renter/', include('renter.urls')),
-    # path('landlord', include('landlord.urls'))
+    path('landlord', include('landlord.urls'))
 ]

@@ -6,8 +6,7 @@ from renter.common.util.rent_structure import calculate_rent_structure
 @login_required
 def dashboard(request):
     if request.user.is_landlord:
-        #TODO: make this landlords dashboard when the links are made
-        return redirect('homepage')
+        return redirect('landlord-dashboard')
     renter = request.user.renter_profile
     if renter.rent:
         context = calculate_rent_structure(renter.rent.charge_field.all())

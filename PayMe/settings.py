@@ -27,7 +27,6 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'landlord.apps.LandlordConfig',
     'renter.apps.RenterConfig',
-    'charges.apps.ChargesConfig',
 ]
 
 MIDDLEWARE = [
@@ -109,5 +108,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+LOGIN_REDIRECT_URL = 'homepage'
 AUTH_USER_MODEL = 'users.User'
 LOGIN_URL = 'login'
