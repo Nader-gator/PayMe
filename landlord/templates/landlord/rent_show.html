@@ -1,0 +1,28 @@
+{% extends 'homepage/base.html' %} {% block content %}
+<h1>Rent show for {{ rent.name }}</h1>
+{% if charges %}
+<ul>
+  {% for charge in charges %}
+  <li>
+    {{ charge.title }}
+  </li>
+  {% endfor %}
+</ul>
+{% endif %}
+<a href="{% url 'new-charge' rent.id %}">Create new charge for this rent</a>
+<a href="{% url 'landlord-dashboard' %}">Go back to dashboard</a>
+<br /><br />
+
+<label for="add-form">
+  Add a renter by email
+  <form id="add-form" method="post">
+    {% csrf_token %}
+    <label>
+      Email
+      <input type="email" required name="email" />
+    </label>
+    <input type="hidden" name="rent_id" value="{{ rent.id }}" />
+    <input type="submit" value="Submit" />
+  </form>
+</label>
+{% endblock content %}

@@ -1,3 +1,11 @@
 {% extends 'homepage/base.html' %} {% block content %}
-<h1>Dash..for now</h1>
-{% endblock content %}
+<h1>Charges for {{ user.first_name }}</h1>
+{% if charges %}
+<ul>
+  {% for charge in charges %}
+  <li>
+    {{ charge.title }}
+  </li>
+  {% endfor %}
+</ul>
+{% endif %} {% endblock content %}

@@ -9,7 +9,7 @@ def dashboard(request):
         return redirect('landlord-dashboard')
     renter = request.user.renter_profile
     if renter.rent:
-        context = calculate_rent_structure(renter.rent.charge_field.all())
+        context = calculate_rent_structure(renter.rent.charge_set.all())
     else:
         context = {}
     return render(request, 'renter/dashboard.html', context)

@@ -1,6 +1,19 @@
-{% extends 'homepage/base.html' %} {% block content %} {% if rents %} {% else %}
+{% extends 'homepage/base.html' %} {% block content %} {% if rents %}
+<div>
+  <ul>
+    {% for rent in rents %}
+    <li>
+      <a href="{% url 'show-rent' rent.id %}">
+        <h2>{{ rent.name }}</h2>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% else %}
 <div>
   <h1>You have not created any rents yet</h1>
-  <a href="{% url 'new-rent' %}">Click here to create a rent</a>
 </div>
-{% endif %} {% endblock content %}
+{% endif %}
+<a href="{% url 'new-rent' %}">Click here to create a rent</a>
+{% endblock content %}
