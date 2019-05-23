@@ -7,7 +7,9 @@ class Renter(models.Model):
     profile = models.OneToOneField(to=User,
                                    on_delete=models.CASCADE,
                                    related_name='renter_profile')
-    rent = models.OneToOneField(to=Rent,
-                                on_delete=models.PROTECT,
-                                null=True,
-                                blank=True)
+    rent = models.ForeignKey(
+        to=Rent,
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+    )

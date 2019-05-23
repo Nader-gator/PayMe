@@ -34,10 +34,24 @@
 </div>
 <br /><br />
 <hr />
+{% if renters %}
+<h3>Renters on this rent</h3>
+<ul class="list-group">
+  {% for renter in renters %}
+  <p class="list-group-item">
+    {{ renter.profile.first_name }} {{ renter.profile.last_name }},
+    {{renter.profile.email }}
+  </p>
+  {% endfor %}
+</ul>
+{% else %}
+<h3>There are no renters on this rent</h3>
+{% endif %}
+<hr />
 <div class="row mt-1">
   <h5>Add a renter to this rent by email</h5>
 </div>
-<div class="row mt-3">
+<div class="row mt-3 mb-5">
   <form id="add-form" method="POST">
     {% csrf_token %}
     <label for="emailinput">Email:</label>

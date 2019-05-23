@@ -2,15 +2,55 @@
 <div class="row mt-5">
   <h1>Charges for {{ user.first_name }}:</h1>
 </div>
-{% if charges %}
-<ul class="list-group mt-5">
-  {% for charge in charges %}
-  <li
-    class="list-group-item list-group-item-action
-    list-group-item-primary ml-3 mt-1"
-  >
-    {{ charge.title }}
-  </li>
-  {% endfor %}
-</ul>
+{% if recurring_charges %}
+<div class="row">
+  <ul class="list-inline mt-5">
+    <h4>Recurring Charges:</h4>
+    {% for charge in recurring_charges %}
+    <li class="list-inline-item">
+      <a
+        href="#"
+        class=" btn list-group-item list-group-item-action
+      list-group-item-{{ charge.alert }} mt-1"
+      >
+        <h1>{{ charge.title }}</h1>
+        <h3>
+          Next Due date:
+          <span>
+            {{ charge.due_date.day }}/{{charge.due_date.month}}
+          </span>
+        </h3>
+        <p>
+          <span>
+            Recurring until
+          </span>
+          {{ charge.recurring_until.month }}/{{charge.recurring_until.year }}
+        </p>
+        <small>{{ charge.status }}</small>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</div>
+{% if one_time_charges %}
+
+<div class="row">
+  <ul class="list-inline mt-5">
+    <h4>One time charges:</h4>
+    {% for charge in one_time_charges %}
+    <li class="list-inline-item">
+      <a
+        href="#"
+        class="list-group-item list-group-item-action
+      list-group-item-{{ charge.alert }} mt-1"
+      >
+        <h3>{{ charge.title }}</h3>
+        <h5>Due date: {{ charge.due_date }}</h5>
+        <small>{{ charge.status }}</small>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
 {% endif %} {% endblock content %}

@@ -6,4 +6,9 @@
   {% csrf_token %} {{ form|crispy }}
   <input type="submit" value="Submit" />
 </form>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    $("#id_date_of_birth").datepicker();
+  });
+</script>
 {% endblock content %}

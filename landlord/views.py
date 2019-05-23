@@ -9,7 +9,8 @@ from users.models import User
 @login_required
 def dashboard(request):
     if not request.user.is_landlord:
-        return redirect(to='renter-dashboard')
+        return render(request, 'homepage/wrong_page.html',
+                      {'wrong_person': 'renter'})
     landlord = request.user.landlord_profile
     if len(landlord.rent_set.all()) > 0:
         context = {'rents': landlord.rent_set.all()}
@@ -36,6 +37,7 @@ def create_new_rent(request):
 
 @login_required
 def show_rent(request, rent_id):
+    rent = Rent.objects.get(id=rent_id)
     if request.method == 'POST':
         requested_user = User.objects.filter(
             email=request.POST.get('email', '')).first()
@@ -44,8 +46,7 @@ def show_rent(request, rent_id):
             if requested_user.renter_profile.rent:
                 messages.error(request, 'user already added to a rent')
             else:
-                #avoiding extra db quesry
-                requested_user.renter_profile.rent_id = rent_id
+                requested_user.renter_profile.rent = rent
                 messages.success(request, 'user added to rent')
                 requested_user.renter_profile.save()
         elif requested_user is not None and requested_user.is_landlord:
@@ -53,9 +54,9 @@ def show_rent(request, rent_id):
         else:
             messages.error(request, 'user does not exist')
 
-    rent = Rent.objects.get(id=rent_id)
+    renters = rent.renter_set.all()
     charges = rent.charge_set.all()
-    context = {'charges': charges, 'rent': rent}
+    context = {'charges': charges, 'rent': rent, 'renters': renters}
     return render(request, 'landlord/rent_show.html', context)
 
 
@@ -63,7 +64,10 @@ def show_rent(request, rent_id):
 def create_new_charge(request, rent_id):
     rent = Rent.objects.get(id=rent_id)
     if request.method == 'POST':
-        form = NewChargeForm(request.POST)
+        request_params = request.POST.copy()
+        date = request.POST.get('recurring_until')
+        request_params.update({'recurring_until': date[:3] + '29' + date[2:]})
+        form = NewChargeForm(request_params)
         if form.is_valid():
             charge = form.save(commit=False)
             charge.rent = rent
