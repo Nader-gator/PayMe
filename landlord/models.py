@@ -34,4 +34,4 @@ class Charge(models.Model):
     amount = models.IntegerField(
         validators=[MinValueValidator(0),
                     MaxValueValidator(100000)])
-    last_month_paid = models.IntegerField()
+    num_months_paid = models.IntegerField()
