@@ -61,14 +61,16 @@ def show_rent(request, rent_id):
 
 @login_required
 def create_new_charge(request, rent_id):
+    rent = Rent.objects.get(id=rent_id)
     if request.method == 'POST':
         form = NewChargeForm(request.POST)
         if form.is_valid():
             charge = form.save(commit=False)
-            charge.rent = Rent.objects.get(id=rent_id)
+            charge.rent = rent
             charge.save()
             messages.success(request, 'charge created')
             return redirect(to='show-rent', rent_id=rent_id)
-
-    context = {'form': NewChargeForm()}
+    else:
+        form = NewChargeForm()
+    context = {'form': form, 'rent': rent}
     return render(request, 'landlord/new_charge.html', context)

@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'landlord.apps.LandlordConfig',
     'renter.apps.RenterConfig',
+    'crispy_forms',
 ]
 
 MIDDLEWARE = [
@@ -111,3 +112,4 @@ STATIC_URL = '/static/'
 LOGIN_REDIRECT_URL = 'landlord-dashboard'
 AUTH_USER_MODEL = 'users.User'
 LOGIN_URL = 'login'
+CRISPY_TEMPLATE_PACK = 'bootstrap4'

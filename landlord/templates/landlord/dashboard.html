@@ -1,19 +1,36 @@
-{% extends 'homepage/base.html' %} {% block content %} {% if rents %}
-<div>
-  <ul>
+{% extends 'homepage/base.html' %} {% block content %}
+
+<div class="row mt-5">
+  <h1>Dashboard</h1>
+</div>
+{% if rents %}
+<h2>Your Rents:</h2>
+<div class="row" style="height: 50vh">
+  <ul class="list-group mt-5">
     {% for rent in rents %}
-    <li>
-      <a href="{% url 'show-rent' rent.id %}">
-        <h2>{{ rent.name }}</h2>
-      </a>
-    </li>
+    <a
+      class="list-group-item list-group-item-action
+      list-group-item-primary ml-3 mt-1"
+      href="{% url 'show-rent' rent.id %}"
+    >
+      <h2>{{ rent.name }}</h2>
+    </a>
     {% endfor %}
   </ul>
 </div>
 {% else %}
-<div>
+<div class="row">
   <h1>You have not created any rents yet</h1>
 </div>
 {% endif %}
-<a href="{% url 'new-rent' %}">Click here to create a rent</a>
+<div class="row ">
+  <div class="col col-md-2">
+    <a
+      class="btn card"
+      style="background-color: lightcoral"
+      href="{% url 'new-rent' %}"
+      >Click here to create a rent</a
+    >
+  </div>
+</div>
 {% endblock content %}

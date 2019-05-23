@@ -1,5 +1,6 @@
 from django.db import models
 from users.models import User
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 class Landlord(models.Model):
@@ -36,3 +37,6 @@ class Charge(models.Model):
     recurring_until = models.DateField(null=True, blank=True)
     active = models.BooleanField(default=True)
     paid = models.BooleanField(default=False)
+    amount = models.IntegerField(
+        validators=[MinValueValidator(0),
+                    MaxValueValidator(100000)])

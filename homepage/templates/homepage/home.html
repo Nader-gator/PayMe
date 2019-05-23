@@ -1,4 +1,27 @@
 {% extends 'homepage/base.html' %} {% block content %}
-<a href="{% url 'renter-dashboard' %}">Renter</a>
-<a href="{% url 'landlord-dashboard' %}">Landlord</a>
+<div class="row mt-5 justify-content-md-center">
+  <h1>Welcome, Click on any of the links to continue</h1>
+</div>
+<div class="row mt-5 justify-content-md-center">
+  <a
+    href="{% url 'landlord-dashboard' %}"
+    class="card btn mr-5"
+    style="width: 18rem;
+    background-color: grey"
+  >
+    <h1>
+      Landlord
+    </h1>
+  </a>
+  <a
+    href="{% url 'renter-dashboard' %}"
+    class="card btn mr-5"
+    style="width: 18rem;
+    background-color: grey"
+  >
+    <h1>
+      Renter
+    </h1>
+  </a>
+</div>
 {% endblock content %}

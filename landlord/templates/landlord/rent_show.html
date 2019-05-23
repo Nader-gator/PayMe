@@ -1,28 +1,55 @@
 {% extends 'homepage/base.html' %} {% block content %}
-<h1>Rent show for {{ rent.name }}</h1>
-{% if charges %}
-<ul>
-  {% for charge in charges %}
-  <li>
-    {{ charge.title }}
-  </li>
-  {% endfor %}
+<div class="row justify-content-md-center mt-5">
+  <h1>Rent show for {{ rent.name }}</h1>
+</div>
+<div class="row mt-1 ml-1">
+  <a class="btn btn-primary" href="{% url 'landlord-dashboard' %}"
+    >Go back to dashboard</a
+  >
+</div>
+<ul class="list-group mt-4">
+  {% if charges %}
+  <div class="row mt-5">
+    <h2>Charges for this rent:</h2>
+  </div>
+  <div class="col">
+    {% for charge in charges %}
+    <li class="list-group-item">
+      {{ charge.title }}
+    </li>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="col mt-5">
+    <h4 class="list-group-item list-group-item-danger">
+      There are no charges on this rent
+    </h4>
+  </div>
+  {% endif %}
 </ul>
-{% endif %}
-<a href="{% url 'new-charge' rent.id %}">Create new charge for this rent</a>
-<a href="{% url 'landlord-dashboard' %}">Go back to dashboard</a>
+<div class="row mt-5 ml-1">
+  <a class="btn btn-secondary" href="{% url 'new-charge' rent.id %}"
+    >Create new charge for this rent</a
+  >
+</div>
 <br /><br />
-
-<label for="add-form">
-  Add a renter by email
-  <form id="add-form" method="post">
+<hr />
+<div class="row mt-1">
+  <h5>Add a renter to this rent by email</h5>
+</div>
+<div class="row mt-3">
+  <form id="add-form" method="POST">
     {% csrf_token %}
-    <label>
-      Email
-      <input type="email" required name="email" />
-    </label>
+    <label for="emailinput">Email:</label>
+    <input
+      id="emailinput"
+      style="height: 2.2rem"
+      type="email"
+      required
+      name="email"
+    />
     <input type="hidden" name="rent_id" value="{{ rent.id }}" />
-    <input type="submit" value="Submit" />
+    <input type="submit" class="btn btn-info" value="Submit" />
   </form>
-</label>
+</div>
 {% endblock content %}

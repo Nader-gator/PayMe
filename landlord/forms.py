@@ -11,4 +11,4 @@ class NewRentForm(ModelForm):
 class NewChargeForm(ModelForm):
     class Meta:
         model = Charge
-        fields = ['title', 'category', 'due_date', 'recurring_until']
+        fields = ['amount', 'title', 'category', 'due_date', 'recurring_until']
