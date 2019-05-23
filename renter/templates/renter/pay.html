@@ -1,0 +1,37 @@
+{% extends 'homepage/base.html' %} {% block header-extras %}
+<script src="https://js.stripe.com/v3"></script>
+{% endblock header-extras %}
+<br />
+
+{% block content %}
+<h1 class="mt-5 mb-5">Payment Page for {{ charge.title }}</h1>
+<form method="POST">
+  {% csrf_token %}
+  <div class="form-group">
+    <label for="payment-amount">Amount You'd like to pay</label>
+    <input
+      type="number"
+      min="0"
+      class="form-control"
+      id="payment-amount"
+      placeholder="0"
+      name="payment-amount"
+    />
+    <small class="form-text text-muted"
+      >You can choose any amount, {{ charge.due_now }} is due</small
+    >
+  </div>
+  <button id="checkout-button">Pay</button>
+  {% if id %} {% block botton-section %}
+
+  <script>
+    var stripe = Stripe("{{ key }}");
+    stripe.redirectToCheckout({ sessionId: "{{ id }}" }).then(function(result) {
+      // If `redirectToCheckout` fails due to a browser or network
+      // error, display the localized error message to your customer
+      // using `result.error.message`.
+    });
+  </script>
+  {% endblock botton-section %} {% endif %}
+</form>
+{% endblock content %}

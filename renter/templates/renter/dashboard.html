@@ -9,7 +9,7 @@
     {% for charge in recurring_charges %}
     <li class="list-inline-item">
       <a
-        href="#"
+        href="{% url 'pay-charge' charge.id %}"
         class=" btn list-group-item list-group-item-action
       list-group-item-{{ charge.alert }} mt-1"
       >
@@ -17,7 +17,7 @@
         <h3>
           Next Due date:
           <span>
-            {{ charge.due_date.day }}/{{charge.due_date.month}}
+            {{ charge.due_date }}
           </span>
         </h3>
         <p>

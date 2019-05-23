@@ -17,7 +17,7 @@
     <title>{{ title }}</title>
     {% else %}
     <title>PayMe</title>
-    {% endif%}
+    {% endif%} {% block header-extras %} {% endblock header-extras %}
   </head>
   <body>
     <header>
@@ -75,5 +75,6 @@
       integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
       crossorigin="anonymous"
     ></script>
+    {% block botton-section %} {% endblock botton-section %}
   </body>
 </html>

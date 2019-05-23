@@ -9,44 +9,43 @@
     <input type="submit" value="Submit" />
   </form>
 </div>
+{% endblock content %} {% block botton-section %}
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    $(function() {
-      if ($("#id_recurring").prop("checked")) {
-        $("#div_id_recurring_until").show();
-      } else {
-        $("#div_id_recurring_until").hide();
-      }
+  $(function() {
+    if ($("#id_recurring").prop("checked")) {
+      $("#div_id_recurring_until").show();
+    } else {
+      $("#div_id_recurring_until").hide();
+    }
 
-      $("#id_due_date")
-        .datepicker()
-        .attr("autocomplete", "off");
-      $("#id_recurring_until")
-        .datepicker({
-          changeMonth: true,
-          changeYear: true,
-          showButtonPanel: true,
-          dateFormat: "mm/yy",
-          onClose: function(dateText, inst) {
-            $(this).datepicker(
-              "setDate",
-              new Date(inst.selectedYear, inst.selectedMonth, 29)
-            );
-          }
-        })
-        .attr("autocomplete", "off");
-    });
-    var label = $("#id_due_date").prop("labels"),
-      labelText = $(label).text();
-    $("#id_recurring").click(function() {
-      if ($(this).is(":checked")) {
-        $("#div_id_recurring_until").show();
-        $(label).text("First " + labelText);
-      } else {
-        $("#div_id_recurring_until").hide();
-        $(label).text(labelText);
-      }
-    });
+    $("#id_due_date")
+      .datepicker()
+      .attr("autocomplete", "off");
+    $("#id_recurring_until")
+      .datepicker({
+        changeMonth: true,
+        changeYear: true,
+        showButtonPanel: true,
+        dateFormat: "mm/yy",
+        onClose: function(dateText, inst) {
+          $(this).datepicker(
+            "setDate",
+            new Date(inst.selectedYear, inst.selectedMonth, 29)
+          );
+        }
+      })
+      .attr("autocomplete", "off");
+  });
+  var label = $("#id_due_date").prop("labels"),
+    labelText = $(label).text();
+  $("#id_recurring").click(function() {
+    if ($(this).is(":checked")) {
+      $("#div_id_recurring_until").show();
+      $(label).text("First " + labelText);
+    } else {
+      $("#div_id_recurring_until").hide();
+      $(label).text(labelText);
+    }
   });
 </script>
-{% endblock content %}
+{% endblock botton-section %}
