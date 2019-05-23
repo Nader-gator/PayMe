@@ -9,6 +9,9 @@ def calculate_rent_structure(charges):
     recurring_charges = []
     todays_date = datetime.now().date()
     for charge in charges:
+        if charge.paid:
+            continue
+
         if charge.recurring:
             charge.due_date += relativedelta(month=charge.num_months_paid)
         if charge.due_date < todays_date:
