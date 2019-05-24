@@ -19,7 +19,7 @@ STRIPE_PUBLIC_KEY = 'pk_test_BmRbPf2ITW6mAAsgqRMIchU200fV8Dr63C'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', False)
 
-ALLOWED_HOSTS = ['paymepls.herokuapp.com']
+ALLOWED_HOSTS = ['paymepls.herokuapp.com', 'localhost']
 
 # Application definition
 

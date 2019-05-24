@@ -26,9 +26,9 @@ def dashboard(request):
 def pay(request, charge_id):
     charge = Charge.objects.get(id=charge_id)
     charge.due_now = charge.amount - charge.amount_paid
-    context = {
-        'charge': charge,
-    }
+    context = {'charge': charge}
+    payment_token = secrets.randbelow(10000)
+    charge.payment_token = payment_token
 
     if request.method == 'POST':
         absolute_uri = request.build_absolute_uri('/')
@@ -44,15 +44,13 @@ def pay(request, charge_id):
                 'currency': 'usd',
                 'quantity': 1,
             }],
-            success_url=absolute_uri[:-1] +
-            reverse('payment-success', args=[charge_id, amount]),
+            success_url=absolute_uri[:-1] + reverse(
+                'payment-success', args=[charge_id, amount, payment_token]),
             cancel_url=absolute_uri[:-1] +
-            reverse('payment-failed', args=[charge_id]),
+            reverse('payment-failed', args=[charge_id, payment_token]),
         )
         context['id'] = session.id
         context['key'] = settings.STRIPE_PUBLIC_KEY
-        payment_token = secrets.randbelow(10000)
-        charge.payment_token = payment_token
         charge.save()
 
     return render(request, 'renter/pay.html', context)
