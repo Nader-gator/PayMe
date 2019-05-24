@@ -1,5 +1,6 @@
 import os
 from django.contrib.messages import constants as messages
+
 MESSAGE_TAGS = {
     messages.ERROR: 'danger',
 }
@@ -18,7 +19,7 @@ STRIPE_PUBLIC_KEY = 'pk_test_BmRbPf2ITW6mAAsgqRMIchU200fV8Dr63C'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', False)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['https://paymepls.herokuapp.com/']
 
 # Application definition
 
@@ -113,6 +114,9 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
+if not DEBUG:
+    import django_heroku
+    django_heroku.settings(locals())
 
 STATIC_URL = '/static/'
 LOGIN_REDIRECT_URL = 'homepage-dashboard'
