@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib import messages
 from landlord.models import Charge
 import stripe
+import secrets
 
 
 @login_required
@@ -50,30 +51,42 @@ def pay(request, charge_id):
         )
         context['id'] = session.id
         context['key'] = settings.STRIPE_PUBLIC_KEY
+        payment_token = secrets.randbelow(10000)
+        charge.payment_token = payment_token
+        charge.save()
+
     return render(request, 'renter/pay.html', context)
 
 
 @login_required
-def success(request, charge_id, amount):
+def success(request, charge_id, amount, token):
     charge = Charge.objects.get(id=charge_id)
-    charge.due_now = charge.amount - charge.amount_paid
     amount = amount // 100
     messages.success(
         request,
         'payment successful',
     )
-    charge.amount_paid += amount
-    if charge.amount_paid >= charge.amount:
-        if charge.recurring:
-            charge.num_months_paid += 1
+    if charge.payment_token == token:
+        charge.amount_paid += amount
+        if charge.amount_paid >= charge.amount:
+            if charge.recurring:
+                charge.num_months_paid += 1
+            else:
+                charge.paid = True
+        if charge.paid:
+            charge.due_now = 'This Charge is paid is full'
         else:
-            charge.paid = True
-    charge.save()
+            charge.due_now = charge.amount - charge.amount_paid
+        charge.payment_token = ''
+        charge.save()
+
     return render(request, 'renter/pay.html', {'charge': charge})
 
 
 @login_required
 def failed(request, charge_id):
     charge = Charge.objects.get(id=charge_id)
+    charge.payment_token = ''
+    charge.save()
     messages.error(request, 'payment failed')
     return render(request, 'renter/pay.html', {'charge': charge})

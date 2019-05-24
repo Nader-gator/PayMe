@@ -41,7 +41,7 @@
     {% for charge in one_time_charges %}
     <li class="list-inline-item">
       <a
-        href="#"
+        href="{% url 'pay-charge' charge.id %}"
         class="list-group-item list-group-item-action
       list-group-item-{{ charge.alert }} mt-1"
       >

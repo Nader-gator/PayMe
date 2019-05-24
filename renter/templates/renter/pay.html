@@ -18,11 +18,12 @@
       name="payment-amount"
     />
     <small class="form-text text-muted"
-      >You can choose any amount, {{ charge.due_now }} is due</small
-    >
+      >You can choose any amount, amount due: {{ charge.due_now }} is due
+    </small>
   </div>
-  <button id="checkout-button">Pay</button>
-  {% if id %} {% block botton-section %}
+  {% if charge.paid is False %}
+  <button id="checkout-button" class="btn btn-primary ">Pay</button>
+  {% endif %} {% if id %} {% block bottom-section %}
 
   <script>
     var stripe = Stripe("{{ key }}");
@@ -32,6 +33,6 @@
       // using `result.error.message`.
     });
   </script>
-  {% endblock botton-section %} {% endif %}
+  {% endblock bottom-section %} {% endif %}
 </form>
 {% endblock content %}

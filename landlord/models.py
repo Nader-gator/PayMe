@@ -36,3 +36,4 @@ class Charge(models.Model):
                     MaxValueValidator(100000)])
     num_months_paid = models.IntegerField(default=0)
     amount_paid = models.IntegerField(default=0)
+    payment_token = models.IntegerField(null=True, blank=True)
