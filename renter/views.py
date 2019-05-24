@@ -75,7 +75,7 @@ def success(request, charge_id, amount, token):
             charge.due_now = 'This Charge is paid is full'
         else:
             charge.due_now = charge.amount - charge.amount_paid
-        charge.payment_token = ''
+        charge.payment_token = None
         charge.save()
 
     return render(request, 'renter/pay.html', {'charge': charge})
@@ -84,7 +84,7 @@ def success(request, charge_id, amount, token):
 @login_required
 def failed(request, charge_id):
     charge = Charge.objects.get(id=charge_id)
-    charge.payment_token = ''
+    charge.payment_token = None
     charge.save()
     messages.error(request, 'payment failed')
     return render(request, 'renter/pay.html', {'charge': charge})
