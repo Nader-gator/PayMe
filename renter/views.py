@@ -6,8 +6,9 @@ from renter.common.util.rent_structure import calculate_rent_structure
 from django.conf import settings
 from django.contrib import messages
 from landlord.models import Charge
+from dateutil.relativedelta import relativedelta
+from secrets import randbelow
 import stripe
-import secrets
 
 
 @login_required
@@ -30,7 +31,7 @@ def pay(request, charge_id):
     context = {'charge': charge}
 
     if request.method == 'POST':
-        payment_token = secrets.randbelow(10000)
+        payment_token = randbelow(10000)
         charge.payment_token = payment_token
         absolute_uri = request.build_absolute_uri('/')
         stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -72,19 +73,24 @@ def success(request):
         request,
         'payment successful',
     )
+    recurring_paid = False
     if charge.payment_token == int(parameters['token']):
         charge.amount_paid += amount
         if charge.amount_paid >= charge.amount:
             if charge.recurring:
                 charge.num_months_paid += 1
+                charge.due_date += relativedelta(months=1)
                 charge.amount_paid = 0
+                recurring_paid = True
+                if charge.due_date == charge.recurring_until:
+                    charge.paid = True
             else:
                 charge.paid = True
         else:
             charge.due_now = charge.amount - charge.amount_paid
         charge.payment_token = None
         charge.save()
-    if charge.paid:
+    if charge.paid or recurring_paid:
         return redirect('renter-dashboard')
     else:
         charge.due_now = charge.amount - charge.amount_paid

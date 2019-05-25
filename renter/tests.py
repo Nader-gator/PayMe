@@ -44,9 +44,9 @@ class RenterTestCase(TestCase):
         self.recurring_charge = Charge.objects.create(
             rent=self.rent,
             title='recurring_charge',
-            due_date=datetime.now() + relativedelta(days=10),
+            due_date=datetime.now().date() + relativedelta(days=10),
             recurring=True,
-            recurring_until=datetime.now() + relativedelta(years=1),
+            recurring_until=datetime.now().date() + relativedelta(years=1),
             amount=2000,
         )
         self.one_time_charge = Charge.objects.create(rent=self.rent,
@@ -116,13 +116,33 @@ class RenterTestCase(TestCase):
         }
         url = reverse('payment-success') + f"?{urlencode(data)}"
         response = c.get(url, follow=True)
-        context = response.context
         self.assertRedirects(response, self.renter_url)
         self.one_time_charge.refresh_from_db()
         self.assertEqual(self.one_time_charge.amount_paid, 200)
         self.assertTrue(self.one_time_charge.paid)
 
-    def test_pay_failiure(self):
+    def test_pay_success_with_balance(self):
+        c = self.client
+        c.login(username=self.renter.email, password=self.password)
+        url = reverse('pay-charge', args=[self.one_time_charge.id])
+        c.post(url, data={'payment-amount': 200})
+        self.one_time_charge.refresh_from_db()
+        data = {
+            'token': self.one_time_charge.payment_token,
+            'charge_id': self.one_time_charge.id,
+            'amount': 100 * 100  #cents
+        }
+        url = reverse('payment-success') + f"?{urlencode(data)}"
+        response = c.get(url, follow=True)
+        context = response.context
+        pay_url = reverse('pay-charge', args=[self.one_time_charge.id])
+        self.assertRedirects(response, pay_url)
+        self.one_time_charge.refresh_from_db()
+        self.assertEqual(self.one_time_charge.amount_paid, 100)
+        self.assertFalse(self.one_time_charge.paid)
+        self.assertEqual(context.get('charge').due_now, 100)
+
+    def test_pay_failure(self):
         c = self.client
         c.login(username=self.renter.email, password=self.password)
         charge_url = reverse('pay-charge', args=[self.one_time_charge.id])
@@ -133,8 +153,48 @@ class RenterTestCase(TestCase):
         }
         fail_url = reverse('payment-failed') + f"?{urlencode(data)}"
         response = c.get(fail_url, follow=True)
-        context = response.context
         self.assertRedirects(response, charge_url)
         self.one_time_charge.refresh_from_db()
         self.assertEqual(self.one_time_charge.amount_paid, 0)
+        self.assertFalse(self.one_time_charge.paid)
+
+    def test_pay_success_recurring(self):
+        c = self.client
+        c.login(username=self.renter.email, password=self.password)
+        url = reverse('pay-charge', args=[self.recurring_charge.id])
+        c.post(url, data={'payment-amount': 2000})
+        self.recurring_charge.refresh_from_db()
+        data = {
+            'token': self.recurring_charge.payment_token,
+            'charge_id': self.recurring_charge.id,
+            'amount': 2000 * 100  #cents
+        }
+        url = reverse('payment-success') + f"?{urlencode(data)}"
+        response = c.get(url, follow=True)
+        self.assertRedirects(response, self.renter_url)
+        new_due_date = self.recurring_charge.due_date + relativedelta(months=1)
+        self.recurring_charge.refresh_from_db()
+        self.assertEqual(self.recurring_charge.due_date, new_due_date)
+        self.assertEqual(self.recurring_charge.amount_paid, 0)
+        self.assertFalse(self.one_time_charge.paid)
+
+    def test_pay_success_recurring_with_balance(self):
+        c = self.client
+        c.login(username=self.renter.email, password=self.password)
+        url = reverse('pay-charge', args=[self.recurring_charge.id])
+        c.post(url, data={'payment-amount': 1800})
+        self.recurring_charge.refresh_from_db()
+        data = {
+            'token': self.recurring_charge.payment_token,
+            'charge_id': self.recurring_charge.id,
+            'amount': 1800 * 100  #cents
+        }
+        url = reverse('payment-success') + f"?{urlencode(data)}"
+        response = c.get(url, follow=True)
+        pay_url = reverse('pay-charge', args=[self.recurring_charge.id])
+        self.assertRedirects(response, pay_url)
+        old_due_date = self.recurring_charge.due_date
+        self.recurring_charge.refresh_from_db()
+        self.assertEqual(self.recurring_charge.due_date, old_due_date)
+        self.assertEqual(self.recurring_charge.amount_paid, 1800)
         self.assertFalse(self.one_time_charge.paid)

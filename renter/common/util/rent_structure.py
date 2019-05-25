@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-from dateutil.relativedelta import relativedelta
 
 
 #Goes through all the available data, removes inactive charges,
@@ -12,8 +11,6 @@ def calculate_rent_structure(charges):
         if charge.paid:
             continue
 
-        if charge.recurring:
-            charge.due_date += relativedelta(month=charge.num_months_paid)
         if charge.due_date < todays_date:
             charge.alert = 'danger'
             charge.status = 'late'
