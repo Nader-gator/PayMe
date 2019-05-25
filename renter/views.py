@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from renter.common.util.rent_structure import calculate_rent_structure
@@ -44,10 +44,10 @@ def pay(request, charge_id):
                 'currency': 'usd',
                 'quantity': 1,
             }],
-            success_url=absolute_uri[:-1] + reverse(
-                'payment-success', args=[charge_id, amount, payment_token]),
-            cancel_url=absolute_uri[:-1] +
-            reverse('payment-failed', args=[charge_id, payment_token]),
+            success_url=absolute_uri[:-1] + reverse('payment-success') +
+            f"?token={payment_token}&charge_id={charge_id}&amount={amount}",
+            cancel_url=absolute_uri[:-1] + reverse('payment-failed') +
+            f"&charge_id={charge_id}",
         )
         context['id'] = session.id
         context['key'] = settings.STRIPE_PUBLIC_KEY
@@ -57,34 +57,38 @@ def pay(request, charge_id):
 
 
 @login_required
-def success(request, charge_id, amount, token):
-    charge = Charge.objects.get(id=charge_id)
-    amount = amount // 100
+def success(request):
+    parameters = request.GET
+    charge = Charge.objects.get(id=parameters['charge_id'])
+    amount = int(parameters['amount']) // 100
     messages.success(
         request,
         'payment successful',
     )
-    if charge.payment_token == token:
+    if charge.payment_token == int(parameters['token']):
         charge.amount_paid += amount
         if charge.amount_paid >= charge.amount:
             if charge.recurring:
                 charge.num_months_paid += 1
             else:
                 charge.paid = True
-        if charge.paid:
-            charge.due_now = 'This Charge is paid is full'
         else:
             charge.due_now = charge.amount - charge.amount_paid
         charge.payment_token = None
         charge.save()
+    if charge.paid:
+        return redirect('renter-dashboard')
+    else:
+        charge.due_now = charge.amount - charge.amount_paid
 
-    return render(request, 'renter/pay.html', {'charge': charge})
+    return redirect('pay-charge', charge_id=charge.id)
 
 
 @login_required
-def failed(request, charge_id):
-    charge = Charge.objects.get(id=charge_id)
+def failed(request):
+    parameters = request.GET
+    charge = Charge.objects.get(id=parameters['charge_id'])
     charge.payment_token = None
     charge.save()
     messages.error(request, 'payment failed')
-    return render(request, 'renter/pay.html', {'charge': charge})
+    return redirect('pay-charge', charge_id=charge.id)

@@ -1,4 +1,4 @@
-from django.forms import ModelForm, ValidationError
+from django.forms import ModelForm
 from .models import Rent, Charge
 from datetime import timedelta, datetime
 
@@ -20,23 +20,20 @@ class NewChargeForm(ModelForm):
         recurring = cleaned_data.get('recurring')
         if due_date and recurring_until:
             if recurring_until < (due_date + timedelta(days=31)):
-                self._errors['recurring_until'] = [
-                    ('Recurring until date must be at least '
-                     '31 days after the due date')
-                ]
+                self.add_error('recurring_until',
+                               ('Recurring until date must be at least '
+                                '31 days after the due date'))
             if recurring_until and not recurring:
-                self.errors['recurring_until'] = [
-                    ("you can't set a recurring until "
-                     "date for one time charges")
-                ]
+                self.add_error('recurring_until',
+                               ("you can't set a recurring until "
+                                "date for one time charges"))
         if due_date and due_date < (datetime.now().date() + timedelta(days=1)):
-            self._errors['due_date'] = [
-                "please select a date at least one after today"
-            ]
+            self.add_error('due_date',
+                           "please select a date at least one after today")
+
         if recurring and not recurring_until:
-            self._errors['recurring_until'] = [
-                'please enter a recurring until date'
-            ]
+            self.add_error('recurring_until',
+                           'please enter a recurring until date')
 
     class Meta:
         model = Charge

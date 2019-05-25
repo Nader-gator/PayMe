@@ -12,6 +12,7 @@
     <input
       type="number"
       min="0"
+      max="{{ charge.due_now }}"
       class="form-control"
       id="payment-amount"
       placeholder="0"
@@ -23,16 +24,12 @@
   </div>
   {% if charge.paid is False %}
   <button id="checkout-button" class="btn btn-primary ">Pay</button>
-  {% endif %} {% if id %} {% block bottom-section %}
+  {% endif %} {% block bottom-section %} {% if id %}
 
   <script>
     var stripe = Stripe("{{ key }}");
-    stripe.redirectToCheckout({ sessionId: "{{ id }}" }).then(function(result) {
-      // If `redirectToCheckout` fails due to a browser or network
-      // error, display the localized error message to your customer
-      // using `result.error.message`.
-    });
+    stripe.redirectToCheckout({ sessionId: "{{ id }}" });
   </script>
-  {% endblock bottom-section %} {% endif %}
+  {% endif %} {% endblock bottom-section %}
 </form>
 {% endblock content %}
