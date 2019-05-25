@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.utils.http import urlencode
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from renter.common.util.rent_structure import calculate_rent_structure
@@ -27,13 +28,19 @@ def pay(request, charge_id):
     charge = Charge.objects.get(id=charge_id)
     charge.due_now = charge.amount - charge.amount_paid
     context = {'charge': charge}
-    payment_token = secrets.randbelow(10000)
-    charge.payment_token = payment_token
 
     if request.method == 'POST':
+        payment_token = secrets.randbelow(10000)
+        charge.payment_token = payment_token
         absolute_uri = request.build_absolute_uri('/')
         stripe.api_key = settings.STRIPE_SECRET_KEY
-        amount = request.POST.get('payment-amount') + "00"
+        amount = request.POST.get('payment-amount') + "00"  #cents
+        success_data = {
+            'token': payment_token,
+            'charge_id': charge_id,
+            'amount': amount
+        }
+        failed_data = {'charge_id': charge_id}
 
         session = stripe.checkout.Session.create(
             payment_method_types=['card'],
@@ -45,9 +52,9 @@ def pay(request, charge_id):
                 'quantity': 1,
             }],
             success_url=absolute_uri[:-1] + reverse('payment-success') +
-            f"?token={payment_token}&charge_id={charge_id}&amount={amount}",
+            f"?{urlencode(success_data)}",
             cancel_url=absolute_uri[:-1] + reverse('payment-failed') +
-            f"&charge_id={charge_id}",
+            f"?{urlencode(failed_data)}",
         )
         context['id'] = session.id
         context['key'] = settings.STRIPE_PUBLIC_KEY
@@ -70,6 +77,7 @@ def success(request):
         if charge.amount_paid >= charge.amount:
             if charge.recurring:
                 charge.num_months_paid += 1
+                charge.amount_paid = 0
             else:
                 charge.paid = True
         else:

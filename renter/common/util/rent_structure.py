@@ -31,6 +31,7 @@ def calculate_rent_structure(charges):
                 recurring_charges.append(charge)
         else:
             one_time_charges.append(charge)
+        charge.save()
 
     return {
         'one_time_charges': one_time_charges,
