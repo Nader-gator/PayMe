@@ -85,10 +85,24 @@ class UserTestCase(GlobalSetup):
                })
         self.assertIsNotNone(User.objects.get(email='homer@simpson.com'))
 
+    def test_user_manager(self):
+        User.objects.create_user(first_name='homer',
+                                 last_name='simpson',
+                                 email='homer@simpson.com',
+                                 date_of_birth=datetime.now().date() -
+                                 relativedelta(years=19),
+                                 password='starwars')
+        self.assertIsNotNone(User.objects.get(email='homer@simpson.com'))
+
+    def test_superuser_manager(self):
+        User.objects.create_superuser(email='homer@simpson.com',
+                                      password='starwars')
+        self.assertIsNotNone(User.objects.get(email='homer@simpson.com'))
+        self.assertTrue(User.objects.get(email='homer@simpson.com').is_staff)
+
     def test_user_update(self):
         c = self.client
-        login = self.client.login(username=self.renter.email,
-                                  password=self.password)
+        self.client.login(username=self.renter.email, password=self.password)
         response = c.get(reverse('profile'))
         self.assertEqual(response.status_code, 200)
         c.post(reverse('profile'),
