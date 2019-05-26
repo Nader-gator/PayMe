@@ -14,7 +14,7 @@ class UserCreationForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super(UserCreationForm, self).clean()
         birthday = cleaned_data.get('date_of_birth')
-        if birthday > (datetime.now().date + relativedelta(years=18)):
+        if birthday > (datetime.now().date() + relativedelta(years=18)):
             self.add_error('date_of_birth', 'you must be atleast 18 years old')
 
         phone_number = cleaned_data.get('phone_number', None)
@@ -46,7 +46,7 @@ class UserChangeForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super(UserChangeForm, self).clean()
         birthday = cleaned_data.get('date_of_birth')
-        if birthday > (datetime.now().date + relativedelta(years=18)):
+        if birthday > (datetime.now().date() + relativedelta(years=18)):
             self.add_error('date_of_birth', 'you must be atleast 18 years old')
 
         phone_number = cleaned_data.get('phone_number', None)

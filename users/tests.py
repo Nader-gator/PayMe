@@ -57,6 +57,54 @@ class GlobalSetup(TestCase):
 
 
 class UserTestCase(GlobalSetup):
+    def test_home_page(self):
+        c = self.client
+        response = c.get(reverse('homepage'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_dashboard_redirect(self):
+        c = self.client
+        c.login(username=self.renter.email, password=self.password)
+        response = c.get(reverse('homepage-dashboard'), follow=True)
+        self.assertRedirects(response, reverse('renter-dashboard'))
+        c.login(username=self.landlord.email, password=self.password)
+        response = c.get(reverse('homepage-dashboard'), follow=True)
+        self.assertRedirects(response, reverse('landlord-dashboard'))
+
+    def test_user_creation(self):
+        c = self.client
+        c.post(reverse('register'),
+               data={
+                   'first_name': 'homer',
+                   'last_name': 'simpson',
+                   'email': 'homer@simpson.com',
+                   'date_of_birth':
+                   datetime.now().date() - relativedelta(years=19),
+                   'password1': 'starwars',
+                   'password2': 'starwars'
+               })
+        self.assertIsNotNone(User.objects.get(email='homer@simpson.com'))
+
+    def test_user_update(self):
+        c = self.client
+        login = self.client.login(username=self.renter.email,
+                                  password=self.password)
+        response = c.get(reverse('profile'))
+        self.assertEqual(response.status_code, 200)
+        c.post(reverse('profile'),
+               data={
+                   'first_name':
+                   'jonny',
+                   'last_name':
+                   'john',
+                   'email':
+                   'fresh@test.com',
+                   'date_of_birth':
+                   datetime.now().date() - relativedelta(years=19),
+               })
+        self.renter.refresh_from_db()
+        self.assertEqual(self.renter.email, 'fresh@test.com')
+
     def test_landlord(self):
         user = self.renter
         self.assertEqual(user.is_landlord, False,

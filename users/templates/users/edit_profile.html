@@ -9,10 +9,12 @@
 </form>
 <script>
   document.addEventListener("DOMContentLoaded", () => {
-    $("#id_date_of_birth").datepicker({
-      defaultDate: new Date($("#id_date_of_birth").val()),
-      dateFormat: "yyyy-mm-dd"
-    });
+    $("#id_date_of_birth")
+      .datepicker({
+        defaultDate: new Date($("#id_date_of_birth").val()),
+        dateFormat: "yy-mm-dd"
+      })
+      .attr("autocomplete", "off");
   });
 </script>
 {% endblock content %}
