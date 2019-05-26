@@ -4,6 +4,8 @@ from .forms import NewRentForm, NewChargeForm
 from django.contrib import messages
 from .models import Rent
 from users.models import User
+from datetime import datetime
+from renter.common.util.rent_structure import landlord_rent_structure
 
 
 @login_required
@@ -55,8 +57,8 @@ def show_rent(request, rent_id):
             messages.error(request, 'user does not exist')
 
     renters = rent.renter_set.all()
-    charges = rent.charge_set.all()
-    context = {'charges': charges, 'rent': rent, 'renters': renters}
+    charges = landlord_rent_structure(rent.charge_set.all())
+    context = {'rent': rent, 'renters': renters, **charges}
     return render(request, 'landlord/rent_show.html', context)
 
 
@@ -65,8 +67,11 @@ def create_new_charge(request, rent_id):
     rent = Rent.objects.get(id=rent_id)
     if request.method == 'POST':
         request_params = request.POST.copy()
-        date = request.POST.get('recurring_until')
-        request_params.update({'recurring_until': date[:3] + '29' + date[2:]})
+        if request_params.get('recurring'):
+            date = datetime.strptime(request_params.get('recurring_until'),
+                                     '%m/%Y')
+            # date.replace(day=29)
+            request_params.update({'recurring_until': date})
         form = NewChargeForm(request_params)
         if form.is_valid():
             charge = form.save(commit=False)

@@ -7,32 +7,54 @@
     >Go back to dashboard</a
   >
 </div>
-<ul class="list-group mt-4">
-  {% if charges %}
-  <div class="row mt-5">
-    <h2>Charges for this rent:</h2>
-  </div>
-  <div class="col">
-    {% for charge in charges %}
-    <li class="list-group-item">
-      {{ charge.title }}
+{% if recurring_charges %}
+<div class="row">
+  <ul class="list-inline mt-5">
+    <h4>Recurring Charges:</h4>
+    {% for charge in recurring_charges %}
+    <li
+      class=" btn list-inline-item  list-group-item-action
+      list-group-item-{{ charge.alert }} mt-1"
+    >
+      <h1>{{ charge.title }}</h1>
+      <h3>
+        Next Due date:
+        <span>
+          {{ charge.due_date }}
+        </span>
+      </h3>
+      <p>
+        <span>
+          Recurring until
+        </span>
+        {{ charge.recurring_until.month }}/{{charge.recurring_until.year }}
+      </p>
+      <small>{{ charge.status }}</small>
     </li>
     {% endfor %}
-  </div>
-  {% else %}
-  <div class="col mt-5">
-    <h4 class="list-group-item list-group-item-danger">
-      There are no charges on this rent
-    </h4>
-  </div>
+  </ul>
   {% endif %}
-</ul>
-<div class="row mt-5 ml-1">
-  <a class="btn btn-secondary" href="{% url 'new-charge' rent.id %}"
-    >Create new charge for this rent</a
-  >
 </div>
-<br /><br />
+{% if one_time_charges %}
+
+<div class="row">
+  <ul class="list-inline mt-5">
+    <h4>One time charges:</h4>
+    {% for charge in one_time_charges %}
+    <li
+      class=" btn list-inline-item  list-group-item-action
+      list-group-item-{{ charge.alert }} mt-1"
+    >
+      <h3>{{ charge.title }}</h3>
+      <h5>Due date: {{ charge.due_date }}</h5>
+      <small>{{ charge.status }}</small>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %} {% if not one_time_charges and not recurring_charges %}
+<h3>There are no renters on this rent</h3>
+{% endif %}
 <hr />
 {% if renters %}
 <h3>Renters on this rent</h3>
@@ -48,6 +70,7 @@
 <h3>There are no renters on this rent</h3>
 {% endif %}
 <hr />
+
 <div class="row mt-1">
   <h5>Add a renter to this rent by email</h5>
 </div>

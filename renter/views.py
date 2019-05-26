@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.utils.http import urlencode
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
-from renter.common.util.rent_structure import calculate_rent_structure
+from renter.common.util.rent_structure import renter_rent_structure
 from django.conf import settings
 from django.contrib import messages
 from landlord.models import Charge
@@ -18,7 +18,7 @@ def dashboard(request):
                       {'wrong_person': 'landlord'})
     renter = request.user.renter_profile
     if renter.rent:
-        context = calculate_rent_structure(renter.rent.charge_set.all())
+        context = renter_rent_structure(renter.rent.charge_set.all())
     else:
         context = {}
     return render(request, 'renter/dashboard.html', context)
@@ -82,8 +82,9 @@ def success(request):
                 charge.due_date += relativedelta(months=1)
                 charge.amount_paid = 0
                 recurring_paid = True
-                if charge.due_date == charge.recurring_until:
-                    charge.paid = True
+                if charge.due_date.year == charge.recurring_until.year:
+                    if charge.due_date.month == charge.recurring_until.month:
+                        charge.paid = True
             else:
                 charge.paid = True
         else:

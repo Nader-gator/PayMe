@@ -1,60 +1,10 @@
-from django.test import TestCase, Client
 from django.utils.http import urlencode
-from landlord.models import Charge, Rent
-from datetime import datetime
 from dateutil.relativedelta import relativedelta
-from users.models import User
 from django.urls import reverse
+from users.tests import GlobalSetup
 
 
-class RenterTestCase(TestCase):
-    def setUp(self):
-        self.landlord_url = reverse('landlord-dashboard')
-        self.renter_url = reverse('renter-dashboard')
-        self.password = 'starwars'
-        self.client = Client()
-        self.renter = User.objects.create(
-            first_name='jonny',
-            last_name='john',
-            email='test@test.com',
-            date_of_birth=datetime.now() - relativedelta(years=19),
-        )
-
-        self.landlord = User.objects.create(first_name='landlord',
-                                            last_name='johnson',
-                                            email='test2@test.com',
-                                            date_of_birth=datetime.now() -
-                                            relativedelta(years=19),
-                                            is_landlord=True,
-                                            phone_number=123456789)
-        self.renter_profile = self.renter.renter_profile
-        self.landlord_profile = self.landlord.landlord_profile
-
-        self.renter.set_password(self.password)
-        self.renter.save()
-        self.landlord.set_password(self.password)
-        self.landlord.save()
-
-        self.rent = Rent.objects.create(landlord=self.landlord_profile,
-                                        name='main_rent')
-
-        self.renter_profile.rent = self.rent
-        self.renter_profile.save()
-
-        self.recurring_charge = Charge.objects.create(
-            rent=self.rent,
-            title='recurring_charge',
-            due_date=datetime.now().date() + relativedelta(days=10),
-            recurring=True,
-            recurring_until=datetime.now().date() + relativedelta(years=1),
-            amount=2000,
-        )
-        self.one_time_charge = Charge.objects.create(rent=self.rent,
-                                                     title='onetime_charge',
-                                                     due_date=datetime.now() +
-                                                     relativedelta(days=10),
-                                                     amount=200)
-
+class RenterTestCase(GlobalSetup):
     def test_dashboard(self):
         c = self.client
         login = c.login(username=self.renter.email, password=self.password)
@@ -198,3 +148,22 @@ class RenterTestCase(TestCase):
         self.assertEqual(self.recurring_charge.due_date, old_due_date)
         self.assertEqual(self.recurring_charge.amount_paid, 1800)
         self.assertFalse(self.one_time_charge.paid)
+
+    def test_pay_success_recurring_last_month(self):
+        self.recurring_charge.due_date += relativedelta(months=10)
+        self.recurring_charge.save()
+        c = self.client
+        c.login(username=self.renter.email, password=self.password)
+        url = reverse('pay-charge', args=[self.recurring_charge.id])
+        c.post(url, data={'payment-amount': 2000})
+        self.recurring_charge.refresh_from_db()
+        data = {
+            'token': self.recurring_charge.payment_token,
+            'charge_id': self.recurring_charge.id,
+            'amount': 2000 * 100  #cents
+        }
+        url = reverse('payment-success') + f"?{urlencode(data)}"
+        response = c.get(url, follow=True)
+        self.assertRedirects(response, self.renter_url)
+        self.recurring_charge.refresh_from_db()
+        self.assertTrue(self.recurring_charge.paid)
