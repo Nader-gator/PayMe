@@ -11,11 +11,10 @@ class Landlord(models.Model):
 
 class Rent(models.Model):
     landlord = models.ForeignKey(to=Landlord, on_delete=models.CASCADE)
-    name = models.CharField(
-        max_length=255,
-        null=False,
-        blank=False,
-    )
+    name = models.CharField(max_length=255,
+                            null=False,
+                            blank=False,
+                            unique=True)
 
 
 class Charge(models.Model):
