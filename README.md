@@ -497,7 +497,12 @@ def failed(request):
 A note on the tests: I have written a suit of unit tests for every app. They have a pretty decent coverage of the codebase but I think
 there is a lot of edge cases that they do not test. They also do not test the frontend components and the Django generated forms.
 
-Also, I tried to keep this project as vanilla as possbile library wise. I used two external libraries for this project,
+A note on server errors: One thing I think the app lacks right now is proper exception handling. Most of the methods are not wrapped in
+try/except which means there is a chance some bugs and/or bad data can cause server errors. Proper error handling across all of the code
+takes a lot of time and I think is out of the scope of this project. I did add try/except wherever I encountered possible bugs but most of the
+codebase is not covered
+
+Also, I tried to keep this project as vanilla as possible library wise. I used two external libraries for this project,
 [dateutil](https://dateutil.readthedocs.io/en/stable/) and [crispy forms](https://django-crispy-forms.readthedocs.io/en/latest/#).
 Dateutil allowed me to increment datetime objects by months and years, which was needed for the due date calculation in
-recurring charges. crispy forms is this very neat library that takes in Django forms and adds Boostrap 4 styling to them.
+recurring charges. crispy forms is this very neat library that takes in Django forms and adds Bootstrap 4 styling to them.

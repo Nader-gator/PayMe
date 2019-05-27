@@ -68,9 +68,11 @@ def create_new_charge(request, rent_id):
     if request.method == 'POST':
         request_params = request.POST.copy()
         if request_params.get('recurring'):
-            date = datetime.strptime(request_params.get('recurring_until'),
-                                     '%m/%Y')
-            # date.replace(day=29)
+            try:
+                date = datetime.strptime(request_params.get('recurring_until'),
+                                         '%m/%Y')
+            except ValueError:
+                date = datetime.now().date()
             request_params.update({'recurring_until': date})
         form = NewChargeForm(request_params)
         if form.is_valid():
