@@ -434,7 +434,9 @@ Every time a POST request comes in for payment, a random number is generated as 
 
 This token is then passed as data to the `success_url` of the Stripe payment system, but not to the `cancel_url`. If Stripe redirects
 the user to `success_url`, The views function checks to see if the token passed in in the url data matches the one in the database,
-and finally registers the payment. Here's a small snippet
+and finally registers the payment. There is different logic to handling payments depending on if they're recurring or not.
+in the case of recurring payments, once amount paid equals amount due, the due date in incremented one month. and amount paid
+is reset to zero Here's a small snippet:
 
 ```python
 def success(request):
@@ -448,6 +450,8 @@ def success(request):
         if charge.amount_paid >= charge.amount:
             if charge.recurring:
                 charge.num_months_paid += 1
+                charge.due_date += relativedelta(months=1)
+                charge.amount_paid = 0
 ```
 
 The payment token system is mainly there so the user can't just refresh the page and register a new payment every time. Essentially, a token
