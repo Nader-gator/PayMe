@@ -471,8 +471,9 @@ def failed(request):
 - The way charges are tracked is not very robust. There is no system for tracking late payments other than simply looking at their due
   dates and weather they are paid or not. This means in future implementing email notification systems could be very challenging.
 
-- The way recurring charges are tracked could use some improving and refactoring. I think the logic I have in place is a bit too hard to
-  read and most likely there are some edge cases that it does not take into account. Breaking up the logic into smaller functions and
+- The way recurring charges and their due date are tracked and updated could use some improving and refactoring.
+- I think the logic I have in place is a bit too hard to
+  read/follow and most likely there are some edge cases that it does not take into account. Breaking up the logic into smaller functions and
   implementing a very through suit of tests would be my next steps.
 
 - Creating Transaction model and table in the database to keep track of every single Transaction would be a great improvement to this
@@ -488,3 +489,8 @@ def failed(request):
 
 A note on the tests: I have written a suit of unit tests for every app. They have a pretty decent coverage of the codebase but I think
 there is a lot of edge cases that they do not test. They also do not test the frontend components and the Django generated forms.
+
+Also, I tried to keep this project as vanilla as possbile library wise. I used two external libraries for this project,
+[dateutil](https://dateutil.readthedocs.io/en/stable/) and [crispy forms](https://django-crispy-forms.readthedocs.io/en/latest/#).
+Dateutil allowed me to increment datetime objects by months and years, which was needed for the due date calculation in
+recurring charges. crispy forms is this very neat library that takes in Django forms and adds Boostrap 4 styling to them.
