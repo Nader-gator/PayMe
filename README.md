@@ -7,7 +7,7 @@ This is a quick walkthrough of the code snippets and the creation process.
 
 Before I start, a few things:
 
-- I went ahead and uploaded the project on Heroku, the database is seeded and ready for use
+- I went ahead and deployed the project on Heroku, the database is seeded and ready for use
   [here](https://paymepls.herokuapp.com/)
   - I have already created two users with the following credentials, one landlord and one renter with some charges already in place
     if you want to jump right into playing around with everything, otherwise feel free to create your own users.
