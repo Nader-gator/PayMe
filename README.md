@@ -26,7 +26,10 @@ Before I start, a few things:
 * as mentioned above, I have set up continuous integration for this project with Travis CI that automatically tests and deploys new builds
 
 * If you wish to run the server locally, begin with `pip install -r requirements.txt`, (do this in a virtual environment), then `python manage.py migrate` and finally `python manage.py runserver`
+
   - again, note that the server will not run if the environment variables are not provided
+
+* The database schema and backend routes are can be found in wiki [here](https://github.com/Nader-gator/PayMe/wiki)
 
 ## Apps
 
