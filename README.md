@@ -120,6 +120,8 @@ def create_relation(sender, instance, created, **kwargs):
             Renter.objects.create(profile=instance)
 ```
 
+---
+
 ### Landlord App
 
 This app handles all the landlord side of things. The urls for this app route to the dashboard show, rent show, and a new charge form show
@@ -266,7 +268,7 @@ fairly self explanatory.
 
   ***
 
-### The Renter App
+### Renter App
 
 This App handles user dashboard and charge payments. The routes are fairly basic, they route to dashboard, charge show (and pay), and two
 landing pages for success or failure of payments. More on these two later in the views section.
@@ -398,15 +400,91 @@ Stripes JavaScript function. The function then redirects the user to the appropr
 
 And in the HTML page:
 
-```JavaScript
-{% block bottom-section %}
-{% if id %}
-
-  <script>
-    var stripe = Stripe("{{ key }}");
-    stripe.redirectToCheckout({ sessionId: "{{ id }}" });
-  </script>
-  {% endif %}
-  {% endblock bottom-section %}
-
+```html
+{% block bottom-section %} {% if id %}
+<script>
+  var stripe = Stripe("{{ key }}");
+  stripe.redirectToCheckout({ sessionId: "{{ id }}" });
+</script>
+{% endif %} {% endblock bottom-section %}
 ```
+
+---
+
+**How successful payments are processed**
+
+You probably noticed these two odd lines passed in as arguments to the Strip function:
+
+```python
+    success_url=absolute_uri[:-1] + reverse('payment-success') + f"?{urlencode(success_data)}",
+    cancel_url=absolute_uri[:-1] + reverse('payment-failed') + f"?{urlencode(failed_data)}",
+```
+
+These two arguments specify where Stripe redirects the user upon completion or failure of the payment. Since integrating Strip into the
+backend to properly confirm payments are successful, I opted for a slightly hacky way of taking care of this.
+
+Every time a POST request comes in for payment, a random number is generated as a token, and saved to the database alongside of the charge.
+
+```python
+    payment_token = randbelow(10000)
+    charge.payment_token = payment_token
+    #...
+    charge.save()
+```
+
+This token is then passed as data to the `success_url` of the Stripe payment system, but not to the `cancel_url`. If Stripe redirects
+the user to `success_url`, The views function checks to see if the token passed in in the url data matches the one in the database,
+and finally registers the payment. Here's a small snippet
+
+```python
+def success(request):
+    #....
+    messages.success(
+        request,
+        'payment successful',
+    )
+    if charge.payment_token == int(parameters['token']):
+        charge.amount_paid += amount
+        if charge.amount_paid >= charge.amount:
+            if charge.recurring:
+                charge.num_months_paid += 1
+```
+
+The payment token system is mainly there so the user can't just refresh the page and register a new payment every time. Essentially, a token
+is only good for one request. If the user ends up on the cancel_url, The token is set to null.
+
+```python
+def failed(request):
+    parameters = request.GET
+    charge = Charge.objects.get(id=parameters['charge_id'])
+    charge.payment_token = None
+    charge.save()
+```
+
+---
+
+**Thing I'd improve in the renter app**
+
+- The token system is very insecure, and has room for a lot of venerabilities. Switching to using the Strip library is definitely the way
+  go, however I skipped this as it was outside of the scope of this project.
+
+- The way charges are tracked is not very robust. There is no system for tracking late payments other than simply looking at their due
+  dates and weather they are paid or not. This means in future implementing email notification systems could be very challenging.
+
+- The way recurring charges are tracked could use some improving and refactoring. I think the logic I have in place is a bit too hard to
+  read and most likely there are some edge cases that it does not take into account. Breaking up the logic into smaller functions and
+  implementing a very through suit of tests would be my next steps.
+
+- Creating Transaction model and table in the database to keep track of every single Transaction would be a great improvement to this
+  system as it is right now. It'll help keep track of what charges have what transactions and transaction ID connected to them.
+
+- finally, same as the previous app, the functions have a few nested if statements and could user some refactoring.
+
+---
+
+---
+
+---
+
+A note on the tests: I have written a suit of unit tests for every app. They have a pretty decent coverage of the codebase but I think
+there is a lot of edge cases that they do not test. They also do not test the frontend components and the Django generated forms.
