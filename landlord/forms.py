@@ -28,8 +28,9 @@ class NewChargeForm(ModelForm):
                                ("you can't set a recurring until "
                                 "date for one time charges"))
         if due_date and due_date < (datetime.now().date() + timedelta(days=1)):
-            self.add_error('due_date',
-                           "please select a date at least one after today")
+            self.add_error(
+                'due_date',
+                "please select a date at least one day after today")
 
         if recurring and not recurring_until:
             self.add_error('recurring_until',

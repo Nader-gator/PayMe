@@ -7,14 +7,14 @@ This is a quick walkthrough of the code snippets and the creation process.
 
 Before I start, a few things:
 
-- I went ahead and deployed the project on Heroku, the database is seeded and ready for use
+- I went ahead and deployed the project on Heroku, it is ready for use
   [here](https://paymepls.herokuapp.com/)
   - I have already created two users with the following credentials, one landlord and one renter with some charges already in place
     if you want to jump right into playing around with everything, otherwise feel free to create your own users.
     - Landlord user: landlord@gmail.com, password: starwars
     - Renter user: renter@gmail.com, password: starwars
-  - Also note, if you want to test Stripe functionality, simply input 424242... As your credit card number (the rest doesn't matter)
-    and it should behave as if you put in a real card
+  - Also note, if you want to test Stripe functionality, simply input 424242... As your credit card number (the name, email, and the rest of the credentials doesn't matter)
+    and it should behave as if you put in a real card number
 
 * The tests I've written for this project are for backend only using Django's built in TestCase. To run the tests, clone the repo and
   run `pip install -r requirements.txt`, then run `./manage.py test`
@@ -25,7 +25,7 @@ Before I start, a few things:
 
 * as mentioned above, I have set up continuous integration for this project with Travis CI that automatically tests and deploys new builds
 
-* If you wish to run the server locally, begin with `pip install -r requirements.txt`, (do this in a virtual environment), then `python manage.py migrate` and finally `python manage.py runserver`
+* If you wish to run the server locally, begin with `pip install -r requirements.txt`, (do this in a virtual environment with python 3.7), then `python manage.py migrate` and finally `python manage.py runserver`
 
   - again, note that the server will not run if the environment variables are not provided
 
@@ -39,7 +39,7 @@ which is mainly why I split everything up
 - [Homepage app](#homepage-app)
 
   - This app doesn't do much other than taking care of the routing and displaying the homepage before users log in. I created this because
-    usually I like to separate the 'Face' of the website (the pretty static pages) from the functioning parts of the website. In
+    usually I like to separate the 'Face' of the website (the static pages) from the functioning parts of the website. In
     a real world app, this would be the section a frontend designer or an outside contractor could work on creating the advertising and front
     sections of the website without having to see the codebase or worrying about breaking functionality of the website.
 
@@ -47,28 +47,32 @@ which is mainly why I split everything up
 
   - This app handles all the user(and superuser) creation, updating, and authentication. I believe that the models in an app that handle
     basic user creation and Auth should not do anything else to avoid complicating matters if the functionality of the website changes
-    and also it ensures better security the less we mess around with the Auth models. The models that handle the functionality of the
+    and also it ensures better security the less we mess around with the Auth models. The models that handle the functionality of the webapp
     are created in the Landlord and Renter apps and linked to the User model with a OneToOne relationship.
 
 - [Landlord app](#landlord-app)
 
   - This app handles all the Rent and charge creation. After logging in(as a landlord) user lands on a dashboard defined in this app and
-    has the ability to create new rents and view rents he has created. The user can enter these rents and view the charges he has created
-    add also add new charge. At the bottom of the page, the user can see what renters are on this rent and also add new renters to
+    has the ability to create new rents and view rents he has created. The user can click on these rents and view the charges he has created in that rent
+    and also add new charges. At the bottom of the page, the user can see what renters are on this rent and also add new renters to
     the rent by email. Finally, the landlord can add charges to the rent. He must give the charge a title and an amount, and finally a
     due date. The landlord can also check a box indicating that the charge is recurring, and indicate the date the charge will be
     recurring until.
 
 - [Renter app](#renter-app)
-  - This app handles all the Renter functions, mainly viewing the rent a user is on, and all the Stripe payment functions. After the
+  - This app handles all the Renter functions, mainly viewing the rent the user is on, and all the Stripe payment functions. After the
     renter logs in he lands in the dashboard where he can see both his recurring and non recurring charges. He can click on any charge
-    and he's taken to a page where he is informed how much of the charge is due. The renter can input however much he wants and then he is
+    and be taken to a page where he is informed of how much of the charge is due. The renter can input however much he wants and then he is
     taken to an external Stripe page where he can input payment information, and then redirected back to the app.
+
+---
 
 ### Homepage App
 
-This app as I discussed earlier handles static parts of the website, which really is just a page asking the user if they are a landlord or
+This app as I discussed earlier handles static pages of the website, which really is just a page asking the user if they are a landlord or
 a renter. It also handles redirecting users from the `/dashboard/` url to the appropriate dashboard if they are logged in.
+
+---
 
 ### User App
 
@@ -79,15 +83,15 @@ This app handles all the authentication and user models, which holds all the per
 As per the specifications, the users have to be able to log in using their email, and certain other fields such as birthday are required.
 Because of this that means the default user model in Django is not sufficient, also Django documentations recommends using custom
 user models,so I decided to
-extend their `AbstractUser` model, which means I can have a modifiable user model I like, and user Django's built in Auth and Admin
+extend the `AbstractUser` model, which means I can have a modifiable user model I like, and use Django's built in Auth and Admin
 system(even though I don't really use the Admin features, I think its good to include it just in case I need it later). To make the
 Admin user work I simply followed the instructions of the docs creating all the necessary class methods to ensure functionality.
 
-Finally, I created custom new user and update user forms extending the built in `ModelForm` in the `Admin.py` folder and registered the
+Finally, I created custom new user and update user forms extending the built in `ModelForm` in the `Admin.py` file and registered the
 user model with the site Admin to make the model work in the Admin page.
 
-Also note that I set `AUTH_USER_MODEL = 'users.User'` in `settings.py`. This means throughout the project when defining relationship to the User model I will import `AUTH_USER_MODEL`
-from the `settings` module for added security and also making it easier to change the Auth user model if the project ends up using a
+Also note that I set `AUTH_USER_MODEL = 'users.User'` in `settings.py`. This means throughout the project when defining relationship to the User model I will use `AUTH_USER_MODEL`
+from the `settings` module making it easier to change the Auth user model if the project ends up using a
 different user model in the future. This was recommended by the Django docs as well.
 
 #### Logging in and out
@@ -146,28 +150,28 @@ Since I wanted the landlord app to encapsulate all the action related to rents a
 - Landlord
   - This is the model that OneToOne connects to the User model. All the rents are then connected to this model by foreign keys
 - Rent
-  - This is the model for Rents, It only has a name and renters are connected to this model by foreign keys every renter only belongs to
+  - This is the model for Rents, It only has a name and renters are connected to this model by foreign keys. Every renter belongs to only
     one Rent and a Rent can have many renters. Many Charges are also belong to a rent through foreign keys
 - Charge
   - This models handles charges. A charge model keeps track of the amount of charge, due date, if its recurring or not, and recurring
     until date. It also has a field that specifics if the charge is paid.
   - since the specifications noted that users can pay any amount they desire, the model has an amount_paid field that defaults to 0
     that keeps tracks of the amount paid.
-  - The models also has a `num_months_paid` which keeps track of how many months have been paid in a recurring charge
-    - I wanted to reuse the database field as much as possible(to avoid repeating code and unnecessary complexity), so recurring charges and
-      one time charges share most fields.
+  - The models also has a `num_months_paid` which keeps track of how many months have been paid in a recurring charge.
+    - I wanted to reuse the database tables as much as possible(to avoid repeating code and unnecessary complexity), so recurring charges and
+      one time charges share the same model.
     - the `num_months_paid` can be used to calculate how many months of balance has been paid for a recurring charge ( example: charge's
       first due date was Jan 1st, recurring until Dec, 3 months are paid therefore the next due date is April 1st)
   - Design note: I designed the database with an `active` field which I didn't really user. The purpose of this field is to enable
     deleting a charge without actually removing it from the database. I believe that data such as these should never be deleted from the
-    database (or at least be set up this way) so that history of activity is easily accessible.
+    database so that history of activity is easily accessible.
 
 ---
 
 #### New Charge forms
 
-Django's while Django's forms generally do a good job of checking form data that they are correct, I had to add a few more rules regarding
-dates into a custom form. Mainly, I wanted to make it so that a landlord cannot set a charge due today or no due date before today. I
+While Django's forms generally do a good job of checking form data that they are correct, I had to add a few more rules regarding
+dates into a custom form. Mainly, I wanted to make it so that a landlord cannot set a charge due today or any charges due before today. I
 also wanted to set some restrictions on recurring until dates (it has to be at least a month from now, after today, etc. )
 
 I simply created a form inheriting from ModelForm. It calls `super` on the existing `clean` method (so all the built in Django restrictions
@@ -192,14 +196,14 @@ class NewChargeForm(ModelForm):
                                 "date for one time charges"))
         if due_date and due_date < (datetime.now().date() + timedelta(days=1)):
             self.add_error('due_date',
-                           "please select a date at least one after today")
+                           "please select a date at least one day after today")
 
         if recurring and not recurring_until:
             self.add_error('recurring_until',
                            'please enter a recurring until date')
 ```
 
-Most of These restrictions are enforced in the frontend at HTML level, but I think it's always good to have backend restrictions for
+Some of These restrictions can be enforced in the frontend at HTML level, but I think it's always good to have backend restrictions for
 "curious" users.
 
 ---
@@ -217,16 +221,12 @@ def dashboard(request):
         return render(request, 'homepage/wrong_page.html',
                       {'wrong_person': 'renter'})
     landlord = request.user.landlord_profile
-    if len(landlord.rent_set.all()) > 0:
-        context = {'rents': landlord.rent_set.all()}
-    else:
-        context = {}
-
+    context = {'rents': landlord.rent_set.all()}
     return render(request, 'landlord/dashboard.html', context)
 
 ```
 
-The logic of the rest of the views is works similar to the function above. In cases of POST request, such as adding a new renter to a rent,
+The logic of the rest of the views is works similar to the function above. In cases of POST requests, such as adding a new renter to a rent,
 the logic is handled in the same function. Here is the function that adds a new user to a rent.
 
 ```python
@@ -304,7 +304,7 @@ def dashboard(request):
 ```
 
 The job of `#renter_rent_structure` is to iterate through the charges, separate them into recurring and one-time mark them as late,
-on time or coming up. The `status` property corresponds to the Bootstrap 4 classes
+on time or coming up. The `alert` property corresponds to the Bootstrap 4 classes
 
 ```python
 
@@ -346,9 +346,9 @@ def renter_rent_structure(charges):
 
 #### Stripe payment processing
 
-Strip's payment system is fairly straight forward. Initially I wanted to user Stripe.js on the frontend only to handle payments. It was
-the fastest way to do so but after reading the docs I learned that, while still fully supported, it's essentially the older version of
-their payment processor and is essentially deprecated. So I decided to stick to their newest method.
+Strip's payment system is fairly straight forward. Initially I wanted to use Stripe.js on the frontend only to handle payments. It was
+the fastest way to do so but after reading the docs I learned that, while still fully supported, it's the older version of
+their payment processor and is will be deprecated soon. So I decided to stick to their newest method.
 
 **N.B.** Stripe has a ton of features that allow user to create customers, create a catalog of products, create charge, track due dates
 on charges, and even create recurring charges. In a real world app in my opinion designing the app with these features in my to allow a
@@ -357,7 +357,7 @@ integrate these features into the backend
 
 - Offload the charge tracking to Stripe. This means every charge made by the landlord, is created in the strip system, and when
   users open their dashboard the status of their payments are all fetched from Stripe
-  - One challenge with this implementation is speed. Fetching multiple charges from strip could potentially take a few seconds.
+  - One challenge with this implementation is speed. When I was playing around with the stripe library I noticed fetching multiple charges from strip usually took a few seconds.
     But I don't think that's a big issue as a simple caching system/local database that updates itself based on Stripe data
     periodically could mitigate this problem
 - Set up signals so that whenever a user is created, a "customer" with the same info is created on Strip and link the user to that Strip
@@ -424,7 +424,7 @@ You probably noticed these two odd lines passed in as arguments to the Strip fun
 ```
 
 These two arguments specify where Stripe redirects the user upon completion or failure of the payment. Since integrating Strip into the
-backend to properly confirm payments are successful, I opted for a slightly hacky way of taking care of this.
+backend to properly confirm payments are successful is outside the scope of this project as I mentioned earlier, I opted for a slightly hacky way of taking care of this.
 
 Every time a POST request comes in for payment, a random number is generated as a token, and saved to the database alongside of the charge.
 
@@ -436,9 +436,9 @@ Every time a POST request comes in for payment, a random number is generated as 
 ```
 
 This token is then passed as data to the `success_url` of the Stripe payment system, but not to the `cancel_url`. If Stripe redirects
-the user to `success_url`, The views function checks to see if the token passed in in the url data matches the one in the database,
-and finally registers the payment. There is different logic to handling payments depending on if they're recurring or not.
-in the case of recurring payments, once amount paid equals amount due, the due date in incremented one month. and amount paid
+the user to `success_url`, The views function checks to see if the token passed in the url data matches the one in the database,
+and finally registers the payment. There is a different logic to handling payments depending on if they're recurring or not.
+In the case of recurring payments, once amount paid equals amount due, the due date in incremented one month, And amount paid
 is reset to zero Here's a small snippet:
 
 ```python
@@ -479,7 +479,7 @@ def failed(request):
   dates and weather they are paid or not. This means in future implementing email notification systems could be very challenging.
 
 - The way recurring charges and their due date are tracked and updated could use some improving and refactoring.
-- I think the logic I have in place is a bit too hard to
+- I think the logic I have in place for registering a payment is a bit too hard to
   read/follow and most likely there are some edge cases that it does not take into account. Breaking up the logic into smaller functions and
   implementing a very through suit of tests would be my next steps.
 
@@ -497,12 +497,12 @@ def failed(request):
 A note on the tests: I have written a suit of unit tests for every app. They have a pretty decent coverage of the codebase but I think
 there is a lot of edge cases that they do not test. They also do not test the frontend components and the Django generated forms.
 
-A note on server errors: One thing I think the app lacks right now is proper exception handling. Most of the methods are not wrapped in
-try/except which means there is a chance some bugs and/or bad data can cause server errors. Proper error handling across all of the code
+A note on server errors: One thing I think the app lacks right now is proper exception handling. Most of the methods handling user input that are susceptible to exceptions are not wrapped in
+try/except which means there is a chance some bug and/or bad data can cause server errors. Proper error handling across all of the code
 takes a lot of time and I think is out of the scope of this project. I did add try/except wherever I encountered possible bugs but most of the
 codebase is not covered
 
 Also, I tried to keep this project as vanilla as possible library wise. I used two external libraries for this project,
 [dateutil](https://dateutil.readthedocs.io/en/stable/) and [crispy forms](https://django-crispy-forms.readthedocs.io/en/latest/#).
 Dateutil allowed me to increment datetime objects by months and years, which was needed for the due date calculation in
-recurring charges. crispy forms is this very neat library that takes in Django forms and adds Bootstrap 4 styling to them.
+recurring charges. Crispy forms is a very neat library that takes in Django forms and adds Bootstrap 4 styling to them.

@@ -14,11 +14,7 @@ def dashboard(request):
         return render(request, 'homepage/wrong_page.html',
                       {'wrong_person': 'renter'})
     landlord = request.user.landlord_profile
-    if len(landlord.rent_set.all()) > 0:
-        context = {'rents': landlord.rent_set.all()}
-    else:
-        context = {}
-
+    context = {'rents': landlord.rent_set.all()}
     return render(request, 'landlord/dashboard.html', context)
 
 
