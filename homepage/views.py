@@ -6,8 +6,9 @@ def home(request):
 
 
 def dashboard(request):
+    if not request.user.is_authenticated:
+        return render(request, 'homepage/home.html')
     if request.user.is_landlord:
         return redirect(to='landlord-dashboard')
     elif not request.user.is_landlord:
         return redirect(to='renter-dashboard')
-    return render(request, 'homepage/home.html')
