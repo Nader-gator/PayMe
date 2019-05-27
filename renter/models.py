@@ -1,10 +1,10 @@
 from django.db import models
-from users.models import User
 from landlord.models import Rent
+from django.conf import settings
 
 
 class Renter(models.Model):
-    profile = models.OneToOneField(to=User,
+    profile = models.OneToOneField(to=settings.AUTH_USER_MODEL,
                                    on_delete=models.CASCADE,
                                    related_name='renter_profile')
     rent = models.ForeignKey(

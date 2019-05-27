@@ -1,10 +1,10 @@
 from django.db import models
-from users.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.conf import settings
 
 
 class Landlord(models.Model):
-    profile = models.OneToOneField(to=User,
+    profile = models.OneToOneField(to=settings.AUTH_USER_MODEL,
                                    on_delete=models.CASCADE,
                                    related_name='landlord_profile')
 

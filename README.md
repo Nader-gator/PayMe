@@ -83,9 +83,9 @@ Admin user work I simply followed the instructions of the docs creating all the 
 Finally, I created custom new user and update user forms extending the built in `ModelForm` in the `Admin.py` folder and registered the
 user model with the site Admin to make the model work in the Admin page.
 
-Also note that I set `AUTH_USER_MODEL = 'users.User'` in `settings.py`. This means throughout the project I will import the user model using
+Also note that I set `AUTH_USER_MODEL = 'users.User'` in `settings.py`. This means throughout the project when defining relationship to the User model I will import `AUTH_USER_MODEL`
 from the `settings` module for added security and also making it easier to change the Auth user model if the project ends up using a
-different user model in the future.
+different user model in the future. This was recommended by the Django docs as well.
 
 #### Logging in and out
 
