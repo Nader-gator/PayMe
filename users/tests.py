@@ -65,10 +65,10 @@ class UserTestCase(GlobalSetup):
     def test_dashboard_redirect(self):
         c = self.client
         c.login(username=self.renter.email, password=self.password)
-        response = c.get(reverse('homepage-dashboard'), follow=True)
+        response = c.get(reverse('home-dashboard'), follow=True)
         self.assertRedirects(response, reverse('renter-dashboard'))
         c.login(username=self.landlord.email, password=self.password)
-        response = c.get(reverse('homepage-dashboard'), follow=True)
+        response = c.get(reverse('home-dashboard'), follow=True)
         self.assertRedirects(response, reverse('landlord-dashboard'))
 
     def test_user_creation(self):

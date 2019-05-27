@@ -119,7 +119,7 @@ if HEROKU:
     django_heroku.settings(locals())
 
 STATIC_URL = '/static/'
-LOGIN_REDIRECT_URL = 'homepage-dashboard'
+LOGIN_REDIRECT_URL = 'home-dashboard'
 AUTH_USER_MODEL = 'users.User'
 LOGIN_URL = 'login'
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
