@@ -28,6 +28,7 @@ def renter_rent_structure(charges):
                 recurring_charges.append(charge)
         else:
             one_time_charges.append(charge)
+        charge.due_now = charge.amount - charge.amount_paid
         charge.save()
 
     return {

@@ -26,6 +26,7 @@
           </span>
           {{ charge.recurring_until.month }}/{{charge.recurring_until.year }}
         </p>
+        <p>Amount due: ${{ charge.due_now }}</p>
         <small>{{ charge.status }}</small>
       </a>
     </li>
@@ -47,6 +48,7 @@
       >
         <h3>{{ charge.title }}</h3>
         <h5>Due date: {{ charge.due_date }}</h5>
+        <p>Amount due: ${{ charge.due_now }}</p>
         <small>{{ charge.status }}</small>
       </a>
     </li>
