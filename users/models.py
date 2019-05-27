@@ -30,7 +30,8 @@ class User(AbstractUser):
     phone_number = models.BigIntegerField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    is_landlord = models.BooleanField(default=False)
+    is_landlord = models.BooleanField(
+        default=False, verbose_name='Check here if you are a landlord')
 
     USERNAME_FIELD = 'email'
     EMAIL_FIELD = 'email'
