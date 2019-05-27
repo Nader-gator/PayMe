@@ -13,17 +13,18 @@
       integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
       crossorigin="anonymous"
     />
-    {% if title %}
-    <title>{{ title }}</title>
-    {% else %}
     <title>PayMe</title>
-    {% endif%} {% block header-extras %} {% endblock header-extras %}
+    {% block header-extras %} {% endblock header-extras %}
   </head>
   <body>
     <header>
       <nav class="navbar navbar-dark bg-dark">
-        <div class="">
+        <div>
+          {% if user.is_authenticated %}
+          <a href="{% url 'home-dashboard' %}" class="navbar-brand">PayMe</a>
+          {% else %}
           <a href="{% url 'homepage' %}" class="navbar-brand">PayMe</a>
+          {% endif %}
         </div>
         <div class="navbar">
           {% if user.is_authenticated %}

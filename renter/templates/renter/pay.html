@@ -4,6 +4,9 @@
 <br />
 
 {% block content %}
+<a class="btn btn-primary mt-2" href="{% url 'renter-dashboard' %}"
+  >Go back to Dashboard</a
+>
 <h1 class="mt-5 mb-5">Payment Page for {{ charge.title }}</h1>
 <form method="POST">
   {% csrf_token %}
