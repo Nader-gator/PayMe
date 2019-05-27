@@ -52,8 +52,6 @@
     {% endfor %}
   </ul>
 </div>
-{% endif %} {% if not one_time_charges and not recurring_charges %}
-<h3>There are no renters on this rent</h3>
 {% endif %}
 <hr />
 {% if renters %}
@@ -69,6 +67,11 @@
 {% else %}
 <h3>There are no renters on this rent</h3>
 {% endif %}
+<hr />
+
+<a class="btn btn-secondary" href="{% url 'new-charge' rent.id %}"
+  >Create new charge for this rent</a
+>
 <hr />
 
 <div class="row mt-1">
